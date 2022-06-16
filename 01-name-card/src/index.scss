@@ -22,11 +22,6 @@ $color-forth: #b97a95;
   #{box-shadow}: $shadow;
 }
 
-// 全局套用動畫
-* {
-  transition-duration: 0.3s;
-}
-
 html,
 body {
   margin: 0;
@@ -52,18 +47,23 @@ body {
   background-color: $color-main;
   border-radius: 4px;
   overflow: hidden;
+
   &:hover {
+    transition-duration: 0.3s;
     @include shadow(16px 16px 4px rgba($color-main, 0.5));
     & .card__circle {
+      transition-duration: 0.3s;
       transform: translate(-50%, -50%) scale(1.1);
     }
     & .card__title {
       &__img > img {
+        transition-duration: 0.3s;
         width: 120%;
       }
     }
-    & .card__panel__left{
-      & img{
+    & .card__panel__left {
+      & img {
+        transition-duration: 0.3s;
         transform: translate(-50%, -50%) scale(1.5);
       }
     }
@@ -233,6 +233,5 @@ body {
         max-width: 200px;
       }
     }
-    
   }
 }
