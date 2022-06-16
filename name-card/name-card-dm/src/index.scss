@@ -1,0 +1,221 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700&display=swap');
+
+// 定義色票
+$color-bg: #c4c8cb;
+$color-main: #222831;
+$color-second: #ffffff;
+$color-third: #00adb5;
+$color-forth: #b2e59f;
+
+// 設定該class的flex相關屬性
+@mixin setFlex($fd: row, $jc: center, $ai: center, $fw: wrap) {
+  display: flex;
+  flex-direction: $fd;
+  justify-content: $jc;
+  align-items: $ai;
+  flex-wrap: $fw;
+}
+
+// 兼容主要瀏覽器shadow語法
+@mixin shadow($shadow...) {
+  @each $pre in -webkit-, -moz-, -ms-, -o- {
+    #{$pre + box-shadow}: $shadow;
+  }
+  #{box-shadow}: $shadow;
+}
+
+* {
+  font-family: 'Roboto Condensed', sans-serif;
+}
+
+html,
+body {
+  margin: 0;
+  background-color: $color-bg;
+  min-height: 100vh;
+  @include setFlex();
+  color: $color-bg;
+}
+
+// 桌布
+.content {
+  @include setFlex();
+  padding: 16px;
+}
+
+// 名片
+.card {
+  position: relative;
+  flex-shrink: 0;
+  margin: 16px;
+  width: 480px;
+  height: 280px;
+  border-radius: 4px;
+  overflow: hidden;
+  transition-duration: 0.3s;
+
+  &:hover {
+    @include shadow(16px 16px 4px rgba($color-main, 0.5));
+    & .card__block {
+      transform: translate(-50%, -50%) rotate(50deg);
+    }
+    & .card__block--4 {
+      top: calc(50% + 10px);
+      left: -10px;
+    }
+    & .card__text > img {
+      transform: rotate(0deg) scale(1.1);
+    }
+    & .card__content__text > h1 {
+      transform: skewX(-15deg);
+    }
+  }
+  // 名片正面
+  &--font {
+    background-color: $color-main;
+  }
+  // 正面內容
+  &--back {
+    background-color: $color-second;
+  }
+
+  // 正面內容
+  &__text {
+    position: absolute;
+    bottom: 0;
+    padding: 30px;
+    transition-delay: 0.2s;
+    & img {
+      transition-duration: 0.3s;
+      width: 50px;
+      transform: rotate(-10deg);
+    }
+    & p,
+    & h3,
+    & h5 {
+      margin: 5px 0px;
+    }
+    & p {
+      letter-spacing: 5px;
+    }
+    & h3 {
+      font-size: 24px;
+      & span {
+        font-weight: normal;
+      }
+    }
+    & h5 {
+      font-weight: normal;
+    }
+  }
+  // 背面內容
+  &__content {
+    position: absolute;
+    top: 50px;
+    right: 50px;
+    color: $color-main;
+    @include setFlex($ai: flex-start);
+    &__icon {
+      width: 50px;
+      margin-right: 20px;
+      & img {
+        width: 100%;
+      }
+    }
+    &__text {
+      & h1 {
+        margin: 0;
+        transition-duration: 0.1s;
+        & span {
+          font-weight: normal;
+        }
+      }
+      & h3 {
+        margin: 0px;
+        font-weight: normal;
+        letter-spacing: 5px;
+        font-size: 14px;
+      }
+      & p {
+        margin-top: 0;
+        margin-bottom: 5px;
+
+        & span {
+          font-weight: bold;
+        }
+      }
+    }
+  }
+  // 裝飾
+  &__block {
+    position: absolute;
+    transform: translate(-50%, -50%) rotate(45deg);
+    transition-duration: 0.3s;
+    &::before {
+      content: '';
+      position: absolute;
+      transform: translate(-50%, -50%);
+      top: 50%;
+      left: 50%;
+      border: solid 20px $color-main;
+      background-color: $color-third;
+    }
+    &--1 {
+      width: 270px;
+      height: 270px;
+      top: -10px;
+      right: -150px;
+      background-color: $color-second;
+      &::before {
+        width: 150px;
+        height: 150px;
+      }
+    }
+    &--2 {
+      width: 290px;
+      height: 290px;
+      bottom: -310px;
+      right: -290px;
+      background-color: $color-forth;
+      transition-delay: 0.1s;
+      &::before {
+        content: '';
+        width: 190px;
+        height: 190px;
+      }
+    }
+    &--3 {
+      width: 180px;
+      height: 180px;
+      border: solid 20px $color-forth;
+      top: calc(50% - 170px);
+      left: 60px;
+      &::before {
+        display: none;
+      }
+    }
+    &--4 {
+      width: 80px;
+      height: 80px;
+      background-color: $color-third;
+      top: 50%;
+      left: 0px;
+      &::before {
+        display: none;
+      }
+    }
+    &--5 {
+      width: 200px;
+      height: 200px;
+      bottom: -215px;
+      left: 60px;
+      background-color: $color-third;
+      &::before {
+        width: 140px;
+        height: 140px;
+        border: solid 10px $color-second;
+        background-color: $color-main;
+      }
+    }
+  }
+}
