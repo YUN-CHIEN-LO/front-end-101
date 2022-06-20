@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./dist/css/index.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
+        integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <title>登入頁</title>
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="circle circle--1"></div>
+        <div class="circle circle--2"></div>
+        <div class="content" id="content">
+            <div>
+                <h1>Log In</h1>
+                <h3>Enter your details below to continue.</h3>
+                <div class="content__input">
+                    <img src="./img/envelope.svg" alt="" srcset="">
+                    <input type="email" name="email" id="email" placeholder="E-Mail Adderess">
+                    <p id="emailError"></p>
+                </div>
+                <div class="content__input">
+                    <img src="./img/lock.svg" alt="" srcset="">
+                    <input type="password" name="password" id="password" placeholder="Password">
+                    <p id="passwordError"></p>
+                </div>
+                <button class="content__button" id="button">Login</button>
+
+                <p id="note">Don't have an account ? <a class="switch">Sign up here</a> </p>
+                <p id="back" style="display: none;">Try again? <a class="switch">Log In here</a></p>
+            </div>
+        </div>
+    </div>
+    <div class="toaster">
+
+    </div>
+</body>
+
+</html>
+
+<script>
+    // 使用者帳密 (此練習暫存於 local storage，實務上不宜將寄密資料明碼存放在 local storage)
+    let users = JSON.parse( localStorage.getItem( "users" ) ) || [];
+    // 是否為登入狀態
+    let isLogin = true;
+
+    $( document ).ready( function () {
+        // 輸入框焦點樣式
+        $( "input" ).focus( ( event ) => {
+            $( event.target ).parent( ".login__input" ).addClass( "is-focus" );
+        } );
+        // 輸入框模糊樣式
+        $( "input" ).blur( () => {
+            $( event.target ).parent( ".login__input" ).removeClass( "is-focus" );
+        } );
+
+        // 切換模式
+        $( '.switch' ).click( () => {
+            switchMode();
+        } );
+
+        // 登入/申請驗證
+        $( '#button' ).click( () => {
+            const email = $( "#email" ).val();
+            const password = $( "#password" ).val();
+
+            // 驗證 email 格式
+            const validEmail = validateEmail( email );
+            // 驗證密碼 格式
+            const validPassword = validatePassword( password )
+
+            // 驗證 email 和 密碼 合法性
+            if ( validEmail && validPassword ) {
+                const validAccount = validateAccount( email, password );
+                // 申請帳號
+                if ( validAccount && !isLogin ) {
+                    // 新增使用者
+                    users.push( {
+                        email: email,
+                        password: password
+                    } )
+                    // 更新 local storage
+                    localStorage.setItem( "users", JSON.stringify( users ) );
+                    // 彈出提示
+                    setToaster( "Successfully Sign Up!" );
+                    // 切換模式，預填帳密
+                    switchMode( email, password );
+                } else if ( validAccount && isLogin ) {
+                    // 登入
+                    setToaster( "Successfully Log In!" );
+                }
+            }
+        } );
+
+    } );
+
+
+    /**
+     * 驗證 email 格式
+     * 
+     * @param {string} value - email 值
+     * @returns {boolean} - 驗證是否通過
+     */
+    const validateEmail = ( value ) => {
+        // 不得為空
+        if ( !value || !value.replace( / /g, '' ).length ) {
+            $( "#emailError" ).text( "Please Inert Email" );
+            return false
+        }
+        // email 格式
+        if ( !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test( value ) ) {
+            $( "#emailError" ).text( "Wrong Format" );
+            return false;
+        }
+        // 驗證通過
+        $( "#emailError" ).text( "" );
+        return true
+    }
+
+    /**
+     * 驗證 密碼 格式
+     * 
+     * @param {string} value - 密碼值
+     * @returns {boolean} - 驗證是否通過
+     */
+    const validatePassword = ( value ) => {
+        // 不得為空
+        if ( !value || !value.replace( / /g, '' ).length ) {
+            $( "#passwordError" ).text( "Please Inert Password" );
+            return false;
+        }
+        // 驗證通過
+        $( "#passwordError" ).text( "" );
+        return true
+    }
+
+    /**
+     * 驗證 帳密關係
+     * 
+     * @param {string} value - email 值
+     * @param {string} value - 密碼值
+     * @returns {boolean} - 驗證是否通過
+     */
+    const validateAccount = ( email, password ) => {
+        const user = users.find( user => user.email === email );
+        // 登入模式
+        if ( isLogin ) {
+            // 不存在的帳號
+            if ( !user ) {
+                $( "#emailError" ).text( "Account not found" );
+                return false;
+            }
+            // 密碼錯誤
+            if ( user.password !== password ) {
+                $( "#passwordError" ).text( "Wrong Password" );
+                return false;
+            }
+        } else {
+            // 申請模式
+            // 重複的帳號
+            if ( user ) {
+                $( "#emailError" ).text( "Account Existed" );
+                return false;
+            }
+            // 密碼至少8碼
+            if ( password.length && password.length < 8 ) {
+                $( "#passwordError" ).text( "At least 8 letters" );
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 切換模式
+     * 
+     * @param {string} value - 預填 email 值
+     * @param {string} value - 預填 密碼值
+     */
+    const switchMode = ( email = "", password = "" ) => {
+        // 切換模式
+        isLogin = !isLogin;
+        // 新增切換 class
+        const contentDOM = $( "#content" );
+        contentDOM.addClass( "is-switch" );
+
+        const timer = setTimeout( () => {
+            // 更新 DOM 內容
+            contentDOM.find( "h1" ).text( isLogin ? "Log In" : "Sign Up" );
+            contentDOM.find( "h3" ).text( isLogin ? "Enter your details below to continue." : "Sign up with your email." )
+            contentDOM.find( "button" ).text( isLogin ? "Log In" : "Sign Up" );
+            $( "#email" ).val( email );
+            $( "#password" ).val( password );
+            $( "#emailError" ).text( "" );
+            $( "#passwordError" ).text( "" );
+            $( "#note" ).css( "display", isLogin ? "block" : "none" );
+            $( "#back" ).css( "display", isLogin ? "none" : "block" );
+            // 移除切換 class
+            contentDOM.removeClass( "is-switch" );
+            clearTimeout( timer );
+        }, 500 );
+    }
+
+    /**
+     * 開啟提示
+     * 
+     * @param {string} text - 文字
+     */
+    const setToaster = ( text ) => {
+        const toasterDOM = $( ".toaster" );
+        toasterDOM.text( text );
+        toasterDOM.addClass( "is-toast" );
+        const timer = setTimeout( () => {
+            toasterDOM.removeClass( "is-toast" );
+            clearTimeout( timer );
+        }, 1000 );
+    }
+</script>
